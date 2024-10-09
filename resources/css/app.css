@@ -7,6 +7,10 @@
     scrollbar-color: rgb(95, 95, 255);
 }
 
+.sensor {
+    width: 100%;
+}
+
 /* .active {
     background-color: rgb(30, 41, 59);
 } */

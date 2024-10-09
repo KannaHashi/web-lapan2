@@ -4,11 +4,7 @@ namespace App\Livewire;
 
 use Illuminate\Support\Facades\DB;
 
-use Carbon\Carbon;
-
 use App\Models\Modis;
-use Livewire\Attributes\Modelable;
-use Livewire\Attributes\On;
 use Livewire\Component;
 
 class DataModis extends Component
@@ -19,12 +15,9 @@ class DataModis extends Component
     public $namadata;
     public $datestart;
     public $dateend;
-
     public $satelit;
 
     public $selectedData;
-
-    // protected $listeners = ['satelitSelected'];
 
     public function mount()
     {
@@ -33,21 +26,54 @@ class DataModis extends Component
         $this->selectedData = null;
     }
 
-    #[On('satelitSelected')]
-    public function satelitSelected($satelit)
+    public function filterData()
     {
-        // Mengupdate variabel parent dengan data yang dipilih berdasarkan ID dari child
-        $selectedModis = Modis::find($satelit);
+        $this->modis = DB::table('modis')
+            ->where('nama_data', $this->namadata)
+            ->where('satelit', $this->satelit)
+            ->whereBetween('tanggal', [$this->datestart, $this->dateend])
+            ->get();
 
-        // Jika data ditemukan, update variabel satelit
-        if ($selectedModis) {
-            $this->satelit = $selectedModis->satelit;
-        } else {
-            $this->satelit = null;
-        }
+            $this->tanggal = $this->datestart . '-' . $this->dateend;
+            // $this->tanggal = Carbon::parse($this->datestart, null). ' - '.  Carbon::parse($this->dateend, null);
+    }
 
-        // Mengupdate variabel parent dengan nilai yang dipilih dari child
-        $this->satelit = $satelit;
+    public function selectData($id)
+    {
+        $this->selectedData = $id;
+    }
+
+    public function render()
+    {
+        return view('livewire.data-modis', [
+            'modis' => $this->modis,
+            'datestart' => $this->datestart,
+            'dateend' => $this->dateend,
+            'selectedData' => $this->selectedData ? Modis::find($this->selectedData) : null,
+        ]);
+    }
+}
+
+namespace App\Livewire;
+
+use Livewire\Component;
+use App\Models\Modis;
+
+class DataModis extends Component
+{
+    public $modis;
+    public $namadata;
+    public $datestart;
+    public $dateend;
+    public $satelit;
+    public $tanggal;
+
+    public $selectedData;
+
+    public function mount()
+    {
+        // Load initial data
+        $this->modis = Modis::all();
     }
 
     public function filterData()
@@ -85,7 +111,7 @@ class DataModis extends Component
     public function render()
     {
         return view('livewire.data-modis', [
-            'modis' => $this->modis,
+            'tanggal' => $this->tanggal,
             'datestart' => $this->datestart,
             'dateend' => $this->dateend,
             'selectedData' => $this->selectedData ? Modis::find($this->selectedData) : null,

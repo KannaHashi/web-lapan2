@@ -19,7 +19,7 @@ class ModisFactory extends Factory
         return [
             'nama_data' => fake()->bothify('a1.#####.####'),
             'satelit' => fake()->randomElement(['Aqua', 'Terra']),
-            'tanggal' => fake()->date('d-m-Y'),
+            'tanggal' => fake()->date('Y-m-d'),
         ];
     }
 }
